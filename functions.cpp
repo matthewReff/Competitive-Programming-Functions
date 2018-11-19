@@ -1,20 +1,21 @@
-void pySplit(string & splitString, char seperator, vector<string> & seperated)
+vector<string> pySplit(string & splitString, char seperator = ' ')
 {
-    int endIndex = 0;
-    seperated.clear();
-    seperated.push_back("");
-    for(unsigned int i = 0; i < splitString.size(); i++)
-    {
-        if (splitString[i] == seperator)
-        {
-            endIndex++;
-            seperated.push_back("");
-        }
-        else
-        {
-            seperated[endIndex] += splitString[i];
-        }
-    }
+	int endIndex = 0;
+	vector<string > seperated;
+	seperated.push_back("");
+	for (unsigned int i = 0; i < splitString.size(); i++)
+	{
+		if (splitString[i] == seperator)
+		{
+			endIndex++;
+			seperated.push_back("");
+		}
+		else
+		{
+			seperated[endIndex] += splitString[i];
+		}
+	}
+	return seperated;
 }
 
 void primeSeive(vector<bool> & primes, long long n)
