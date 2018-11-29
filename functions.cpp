@@ -12,18 +12,40 @@ struct mstEdge
 
 };
 
-vector<mstEdge> kruskal(priority_queue<mstEdge> q, int verticies)
+vector<mstEdge> kruskal(vector<pair<double, double> > points)
 {
+    priority_queue<mstEdge> q;
+    int verticies = points.size();
     vector< set< int > > vertSets(verticies);
     unordered_map<int, int> setLoc;
+    vector<mstEdge> mst;
+    mstEdge temp;
+    int index1, index2;
+    
+    //create vector of sets with one vertex per set
+    //ex: {{0}, {1}, {2}, {3}}
     for (int i = 0; i < verticies; i++)
     {
         vertSets[i].insert(i);
         setLoc[i] = i;
     }
-    vector<mstEdge> mst;
-    mstEdge temp;
-    int index1, index2;
+    
+    //calculate and push all edges into queue
+    for (int i = 0; i < points.size(); i++)
+    {
+        for (int j = i + 1; j < points.size(); j++)
+        {
+            temp.distance = sqrt((points[j].first - points[i].first) *
+                (points[j].first - points[i].first) + (points[j].second - points[i].second)
+                * (points[j].second - points[i].second));
+            temp.src = j;
+            temp.dest = i;
+            q.push(temp);
+        }
+    }
+  
+    //starting at shortest edge distance, if edge is across different sets, combine them
+    //also add edge to mst, when mst is complete return it
     while (mst.size() != verticies - 1)
     {
         temp = q.top();
