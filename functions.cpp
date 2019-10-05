@@ -105,3 +105,40 @@ void primeSeive(vector<bool> & primes, long long n)
         }
     }
 }
+
+void floodFill(ll currentRow, ll currentCol, vector<string> &image, vector<vector<bool>> &found, ll rows, ll cols)
+{
+    found[currentRow][currentCol] = true;
+    ll tempRow, tempCol;
+    for (ll k = 0; k < 4; k++)
+    {
+        switch (k) {
+        case 0:
+            tempRow = currentRow - 1;
+            tempCol = currentCol;
+            break;
+            break;
+        case 1:
+            tempRow = currentRow;
+            tempCol = currentCol + 1;
+            break;
+        case 2:
+            tempRow = currentRow + 1;
+            tempCol = currentCol;
+            break;
+            break;
+        case 3:
+            tempRow = currentRow;
+            tempCol = currentCol - 1;
+            break;
+        };
+
+
+        if (tempRow >= 0 && tempRow < rows && tempCol >= 0 &&
+            tempCol < cols && !found[tempRow][tempCol] &&
+            ({fill_condition})
+        {
+            floodFill(tempRow, tempCol, image, found, rows, cols);
+        }
+    }
+}
