@@ -142,3 +142,32 @@ void floodFill(ll currentRow, ll currentCol, vector<string> &image, vector<vecto
         }
     }
 }
+
+	    
+	    
+vector<ll> parent;
+vector<ll> sizeArr;
+
+//shamelessly stolen from
+//https://cp-algorithms.com/data_structures/disjoint_set_union.html
+void make_set(int v) {
+    parent[v] = v;
+    sizeArr[v] = 1;
+}
+
+int find_set(int v) {
+    if (v == parent[v])
+        return v;
+    return parent[v] = find_set(parent[v]);
+}
+
+void union_sets(int a, int b) {
+    a = find_set(a);
+    b = find_set(b);
+    if (a != b) {
+        if (sizeArr[a] < sizeArr[b])
+            swap(a, b);
+        parent[b] = a;
+        sizeArr[a] += sizeArr[b];
+    }
+}
