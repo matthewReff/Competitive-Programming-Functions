@@ -203,3 +203,34 @@ struct FenwickTree {
             bit[idx] += delta;
     }
 };
+
+	    
+const ll INF = ll(1) << 60;
+vector<vector<pair<int, int>>> adj;
+
+//stolen again from cp-algorithms
+void dijkstra(int startingLoc, vector<ll> & distArr, vector<ll> & parentArr) {
+    int n = adj.size();
+    distArr.assign(n, INF);
+    parentArr.assign(n, -1);
+
+    distArr[startingLoc] = 0;
+    set<pair<int, int>> q;
+    q.insert({0, startingLoc});
+    while (!q.empty()) {
+        int v = q.begin()->second;
+        q.erase(q.begin());
+
+        for (auto edge : adj[v]) {
+            ll to = edge.first;
+            ll len = edge.second;
+
+            if (distArr[v] + len < distArr[to]) {
+                q.erase({distArr[to], to});
+                distArr[to] = distArr[v] + len;
+                parentArr[to] = v;
+                q.insert({distArr[to], to});
+            }
+        }
+    }
+}
