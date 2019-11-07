@@ -212,17 +212,17 @@ void dijkstra(int startingLoc, vector<ll> & distArr, vector<ll> & parentArr) {
 // stolen from my coach	    
 // Implementation of Hopcroft-Karp algorithm
 struct BipartiteMatcher {
-    vector<vector<int>> G;
-    vector<int> L, R, Viz;
+    vector<vector<ll>> G;
+    vector<ll> L, R, Viz;
     vector<bool> visitedA, visitedB;
     BipartiteMatcher(int n, int m) :
         G(n), L(n, -1), R(m, -1), Viz(n), visitedA(n), visitedB(m) {}
 
-    void AddEdge(int a, int b) {
+    void AddEdge(ll a, ll b) {
         G[a].push_back(b);
     }
 
-    bool Match(int node) {
+    bool Match(ll node) {
         if (Viz[node])
             return false;
         Viz[node] = true;
@@ -240,17 +240,17 @@ struct BipartiteMatcher {
         while (ok) {
             ok = false;
             fill(Viz.begin(), Viz.end(), 0);
-            for (int i = 0; i < L.size(); ++i)
+            for (ll i = 0; i < L.size(); ++i)
                 if (L[i] == -1)
                     ok |= Match(i);
         }
 
         int ret = 0;
-        for (int i = 0; i < L.size(); ++i)
+        for (ll i = 0; i < L.size(); ++i)
             ret += (L[i] != -1);
         return ret;
     }
-    void dfs(int node) {
+    void dfs(ll node) {
         visitedA[node] = true;
         for (auto to : G[node]) {
             if (!visitedB[to] && R[to] != -1) {
@@ -263,20 +263,97 @@ struct BipartiteMatcher {
     //O(time to find max matching) + O(n)
     //first vector: all nodes in the cover on the left side
     //second vector: all nodes in the cover on the right side
-    pair<vector<int>, vector<int>> getMinVertexCover() {
+    pair<vector<ll>, vector<ll>> getMinVertexCover() {
         Solve();
         for (int i = 0; i < L.size(); ++i) {
             if (L[i] == -1) {
                 dfs(i);
             }
         }
-        pair<vector<int>, vector<int>> cover;
-        for (int i = 0; i < L.size(); ++i) {
+        pair<vector<ll>, vector<ll>> cover;
+        for (ll i = 0; i < L.size(); ++i) {
             if (!visitedA[i]) cover.first.push_back(i);
         }
         for (int i = 0; i < R.size(); ++i) {
             if (visitedB[i]) cover.second.push_back(i);
         }
         return cover;
+    }
+};
+
+	    
+struct SegmentTree {
+    vector<ll> treeSum, treeMax, lazy;
+    ll n, root, size;
+    SegmentTree(int currSize) : n(currSize), root(1) {
+        ll x = (ll)(ceil(log2(currSize)));
+        size = 2*(ll)pow(2, x);
+        treeSum.resize(size, 0);
+        treeMax.resize(size, 0);
+        lazy.resize(size, 0);
+    }
+    SegmentTree(const vector<ll> &arr) : n(arr.size()), root(1) {
+        ll x = (ll)(ceil(log2(n)));
+        size = 2*(ll)pow(2, x);
+        treeSum.resize(size);
+        treeMax.resize(size);
+        lazy.resize(size, 0);
+        build(arr, root, 0, n-1);
+    }
+    void build(const vector<ll> &arr, int node, int start, int end) {
+        if(start == end) treeMax[node] = treeSum[node] = arr[start];
+        else {
+            ll mid = (start+end)/2;
+            build(arr, 2*node, start, mid);
+            build(arr, 2*node+1, mid+1, end);
+            treeSum[node] = treeSum[2*node] + treeSum[2*node+1];
+            treeMax[node] = max(treeMax[2*node], treeMax[2*node+1]);
+        }
+    }
+    void pendingUpdate(int node, int start, int end) {
+        if(lazy[node]) {
+            treeSum[node] += (end-start+1) * lazy[node];
+            treeMax[node] += lazy[node];
+            if(start != end) {
+                lazy[2*node] += lazy[node];
+                lazy[2*node+1] += lazy[node];
+            }
+            lazy[node] = 0;
+        }
+    }
+    void updateRange(int l, int r, ll diff) {updateRange(root, 0, n-1, l, r, diff);}
+    void updateRange(int node, int start, int end, int l, int r, ll diff) {
+        pendingUpdate(node, start, end);
+        if(start > end || start > r || end < l) return;
+        if(start >= l && end <= r) {
+            treeSum[node] += (end-start+1) * diff;
+            treeMax[node] += diff;
+            if(start != end) {
+                lazy[2*node] += diff;
+                lazy[2*node+1] += diff;
+            }
+            return;
+        }
+        ll mid = (start + end) / 2;
+        updateRange(2*node, start, mid, l, r, diff);
+        updateRange(2*node+1, mid+1, end, l, r, diff);
+        treeSum[node] = treeSum[2*node] + treeSum[2*node+1];
+        treeMax[node] = max(treeMax[2*node], treeMax[2*node+1]);
+    }
+    ll querySum(int l, int r) {return querySum(root, 0, n-1, l, r);}
+    ll querySum(int node, int start, int end, int l, int r) {
+        if(r < start || end < l) return 0;
+        pendingUpdate(node, start, end);
+        if(l <= start && end <= r) return treeSum[node];
+        ll mid = (start+end)/2;
+        return querySum(2*node, start, mid, l, r) + querySum(2*node+1, mid+1, end, l, r);
+    }
+    ll queryMax(int l, int r) {return queryMax(root, 0, n-1, l, r);}
+    ll queryMax(int node, int start, int end, int l, int r) {
+        if(r < start || end < l) return -1e18;
+        pendingUpdate(node, start, end);
+        if(l <= start && end <= r) return treeMax[node];
+        ll mid = (start+end)/2;
+        return max(queryMax(2*node, start, mid, l, r), queryMax(2*node+1, mid+1, end, l, r));
     }
 };
