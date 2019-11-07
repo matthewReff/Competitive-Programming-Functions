@@ -93,7 +93,6 @@ void floodFill(ll currentRow, ll currentCol, vector<string> &image, vector<vecto
             tempRow = currentRow - 1;
             tempCol = currentCol;
             break;
-            break;
         case 1:
             tempRow = currentRow;
             tempCol = currentCol + 1;
@@ -101,7 +100,6 @@ void floodFill(ll currentRow, ll currentCol, vector<string> &image, vector<vecto
         case 2:
             tempRow = currentRow + 1;
             tempCol = currentCol;
-            break;
             break;
         case 3:
             tempRow = currentRow;
